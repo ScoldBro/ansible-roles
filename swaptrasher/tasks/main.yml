@@ -14,9 +14,11 @@
   ansible.builtin.lineinfile:
     path: /etc/fstab
     state: absent
-    regexp: '^\s*{{ path_swapfile | regex_escape }}\s+.*\sswap\s+.*$'
+    regexp: '^\s*\S+\s+\S+\s+swap\s+'
 
 - name: Remove file swapfile
   ansible.builtin.file:
     path: "{{ path_swapfile }}"
     state: absent
+
+
