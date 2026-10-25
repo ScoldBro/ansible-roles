@@ -1,4 +1,40 @@
 ---
 - name: Set timezone to Europe/Moscow
   community.general.timezone:
-    name: Europe/Moscow
+    name: "{{ region }}/{{ city }}"
+
+- name: Rename hostname
+  ansible.builtin.hostname:
+    name: "{{ inventory_hostname }}"
+
+- block:
+    - name: create a swap file
+      shell: fallocate -l {{ swap_size }} /swapfile
+      args:
+        creates: "{{ path_swapfile }}"
+
+    - name: set permission
+      file:
+        path: "{{ path_swapfile }}"
+        owner: root
+        group: root
+        mode: '0600'
+
+    - name: make the file a swap file
+      shell: mkswap "{{ path_swapfile }}"
+      when: ansible_facts.swapfree_mb == 0
+
+    - name: enable the swap file
+      shell: swapon "{{ path_swapfile }}"
+      when: ansible_facts.swapfree_mb == 0
+
+    - name: add swap file to fstab
+      mount:
+        name: none
+        src: "{{ path_swapfile }}"
+        fstype: swap
+        opts: sw
+        passno: 0
+        dump: 0
+        state: present
+
