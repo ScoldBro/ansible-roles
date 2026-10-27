@@ -3,18 +3,17 @@
   ansible.builtin.command: "swapon --show=NAME --noheadings"
   register: swapon_result
   changed_when: false
-  failed_when: false
 
 - name: disable swap if he is active
-  ansible.builtin.command: swapoff -a
-  when: swapon_result.stdout | length > 0
+  ansible.builtin.command: "swapoff {{ path_swapfile }}"
+  when: path_swapfile in swapon_result.stdout_lines
   changed_when: true
 
 - name: Remove swap from /etc/fstab
   ansible.builtin.lineinfile:
     path: /etc/fstab
     state: absent
-    regexp: '^\s*\S+\s+\S+\s+swap\s+'
+    regexp: '^\s*{{ path_swapfile | regex_escape }}\s+\S+\s+swap\s+'
 
 - name: Remove file swapfile
   ansible.builtin.file:
