@@ -35,7 +35,8 @@
   apt:
     update_cache: yes
     state: present
-    name: "{{ docker_packages }}"
+  loop:
+    - "{{ docker_packages }}"
 
 - name: check docker
   service:
