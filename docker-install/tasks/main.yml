@@ -4,7 +4,7 @@
     name: "{{ item }}"
     state: present
     update_cache: yes
-  loop: "{{ packages }}"
+  loop: "{{ docker_prerequisites }}"
 
 - name: create directory for docker
   file:
@@ -33,10 +33,9 @@
 - name: apt-get update and install docker-ce
   apt:
     name: "{{ item }}"
-    update_cache: yes
     state: present
-  loop:
-    - "{{ docker_packages }}"
+    update_cache: yes
+  loop: "{{ docker_packages }}"
 
 - name: Check docker
   service:
